@@ -182,6 +182,94 @@ TWILIO_API_KEY=your_twilio_api_key
 
 ---
 
+## 🏗️ System Architecture
+
+### 📊 Platform Overview
+
+AgriGuru follows a modern, scalable microservices architecture designed for high availability and seamless user experience. The platform integrates multiple layers of technology to deliver comprehensive agricultural solutions.
+
+<div align="center">
+  <img src="docs/architecture-diagram.svg" alt="AgriGuru System Architecture" width="100%">
+</div>
+
+### 🎯 Architecture Layers
+
+#### 👥 **User Layer**
+- **🧑‍🌾 Farmers**: Primary users seeking agricultural guidance and solutions
+- **👨‍💼 Agricultural Officers**: Government officials monitoring and supporting farming activities
+- **📱 Rural Tech Users**: Tech-savvy farmers adopting digital farming solutions
+- **🏢 AgriTech Partners**: Organizations integrating with AgriGuru services
+
+#### 💻 **Frontend Layer (React.js)**
+- **🏠 Dashboard**: Comprehensive farming analytics and insights
+- **🤖 AI Chat**: Intelligent agricultural assistant with multilingual support
+- **🌱 Soil Analysis**: Advanced soil health monitoring and recommendations
+- **🔍 Disease Detection**: Computer vision-powered crop disease identification
+- **💰 Market Dashboard**: Real-time commodity prices and market trends
+- **🌤️ Weather Widget**: Hyperlocal weather forecasts and alerts
+- **🛒 E-commerce**: Agricultural products marketplace
+- **📚 AgriGuide**: Comprehensive farming knowledge base
+- **📝 Contract Farming**: Digital contract management system
+- **💬 Group Chat**: Farmer community communication platform
+
+#### 🔧 **Backend Layer (Flask/Python)**
+- **🤖 AI Expert API**: Groq-powered agricultural consultation service
+- **🔍 Crop Analysis API**: Image-based crop health assessment
+- **🌤️ Weather Service**: Weather data aggregation and forecasting
+- **🌱 Soil Analysis API**: Soil composition and health analysis
+- **💰 Market Price API**: Real-time commodity price tracking
+- **📰 News Service**: Agricultural news aggregation
+- **🔐 Authentication API**: Secure user management
+- **📱 WhatsApp Integration**: Emergency alerts and notifications
+
+#### 🧠 **AI & Machine Learning Layer**
+- **🚀 Groq AI Engine**: Advanced natural language processing for farming queries
+- **👁️ Computer Vision**: Image recognition for crop and disease identification
+- **📊 ML Models**: Predictive analytics for crop recommendations
+- **🌱 Soil Health Analysis**: AI-powered soil condition assessment
+- **🔮 Predictive Analytics**: Weather and market trend predictions
+
+#### 🔗 **External APIs & Services**
+- **🌤️ OpenWeatherMap**: Weather data and forecasts
+- **💰 Agmarknet**: Government market price data
+- **📰 News API**: Latest agricultural news and updates
+- **📱 Twilio/Gupshup**: SMS and WhatsApp messaging
+- **🌿 PlantNet**: Plant identification and classification
+- **🔍 Plant.id**: Advanced plant disease detection
+- **🌍 ISRIC SoilGrids**: Global soil information system
+
+#### 💾 **Database & Storage Layer**
+- **🔥 Firebase Database**: Real-time user data and application state
+- **☁️ Cloud Storage**: Media files and document storage
+- **💻 Local Storage**: Client-side data caching
+- **🔄 Session Storage**: Temporary user session data
+
+#### ☁️ **Cloud Infrastructure**
+- **▲ Vercel**: Frontend deployment and global CDN
+- **🌐 Google Cloud Platform**: Backend services and APIs
+- **📊 Analytics**: User behavior and application performance monitoring
+- **🔍 Monitoring**: System health and error tracking
+- **🚀 CI/CD Pipeline**: Automated deployment and testing
+
+### 🔄 Data Flow Architecture
+
+1. **User Interaction**: Users interact through the React.js frontend
+2. **API Communication**: Frontend communicates with Flask backend via REST APIs
+3. **AI Processing**: Backend leverages Groq AI and ML models for intelligent responses
+4. **External Data**: Integration with weather, market, and agricultural APIs
+5. **Data Storage**: Persistent storage in Firebase with cloud backup
+6. **Real-time Updates**: WebSocket connections for live data streaming
+
+### 🔒 Security & Performance
+
+- **🛡️ Authentication**: Multi-factor authentication with Firebase Auth
+- **🔐 API Security**: Rate limiting and API key management
+- **📈 Scalability**: Auto-scaling cloud infrastructure
+- **⚡ Performance**: CDN delivery and optimized caching
+- **🔍 Monitoring**: Real-time error tracking and performance metrics
+
+---
+
 ## 🏗️ Project Structure
 
 ```
