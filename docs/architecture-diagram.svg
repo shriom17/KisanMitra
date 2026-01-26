@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1400" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
+  <!-- Title -->
+  <text x="600" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#2c3e50">
+    🌾 AgriGuru - AI-Powered Smart Farming Platform Architecture
+  </text>
+  
+  <!-- User Layer -->
+  <g id="user-layer">
+    <rect x="50" y="80" width="1100" height="100" rx="15" fill="#e8f5e8" stroke="#4CAF50" stroke-width="2"/>
+    <text x="600" y="110" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#2c5530">
+      👥 User Layer
+    </text>
+    
+    <!-- User Types -->
+    <rect x="100" y="130" width="200" height="40" rx="8" fill="#4CAF50" opacity="0.8"/>
+    <text x="200" y="153" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="white">
+      🧑‍🌾 Farmers
+    </text>
+    
+    <rect x="350" y="130" width="200" height="40" rx="8" fill="#4CAF50" opacity="0.8"/>
+    <text x="450" y="153" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="white">
+      👨‍💼 Agricultural Officers
+    </text>
+    
+    <rect x="600" y="130" width="200" height="40" rx="8" fill="#4CAF50" opacity="0.8"/>
+    <text x="700" y="153" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="white">
+      📱 Rural Tech Users
+    </text>
+    
+    <rect x="850" y="130" width="200" height="40" rx="8" fill="#4CAF50" opacity="0.8"/>
+    <text x="950" y="153" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="white">
+      🏢 AgriTech Partners
+    </text>
+  </g>
+  
+  <!-- Frontend Layer -->
+  <g id="frontend-layer">
+    <rect x="50" y="220" width="1100" height="180" rx="15" fill="#e3f2fd" stroke="#2196F3" stroke-width="2"/>
+    <text x="600" y="250" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#1565c0">
+      💻 Frontend Layer - React.js Application
+    </text>
+    
+    <!-- Frontend Components Row 1 -->
+    <rect x="80" y="270" width="160" height="35" rx="5" fill="#2196F3" opacity="0.8"/>
+    <text x="160" y="291" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+      🏠 Dashboard
+    </text>
+    
+    <rect x="260" y="270" width="160" height="35" rx="5" fill="#2196F3" opacity="0.8"/>
+    <text x="340" y="291" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+      🤖 AI Chat
+    </text>
+    
+    <rect x="440" y="270" width="160" height="35" rx="5" fill="#2196F3" opacity="0.8"/>
+    <text x="520" y="291" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+      🌱 Soil Analysis
+    </text>
+    
+    <rect x="620" y="270" width="160" height="35" rx="5" fill="#2196F3" opacity="0.8"/>
+    <text x="700" y="291" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+      🔍 Disease Detection
+    </text>
+    
+    <rect x="800" y="270" width="160" height="35" rx="5" fill="#2196F3" opacity="0.8"/>
+    <text x="880" y="291" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+      💰 Market Dashboard
+    </text>
+    
+    <rect x="980" y="270" width="160" height="35" rx="5" fill="#2196F3" opacity="0.8"/>
+    <text x="1060" y="291" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+      🌤️ Weather Widget
+    </text>
+    
+    <!-- Frontend Components Row 2 -->
+    <rect x="80" y="320" width="160" height="35" rx="5" fill="#2196F3" opacity="0.8"/>
+    <text x="160" y="341" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+      🛒 E-commerce
+    </text>
+    
+    <rect x="260" y="320" width="160" height="35" rx="5" fill="#2196F3" opacity="0.8"/>
+    <text x="340" y="341" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+      📚 AgriGuide
+    </text>
+    
+    <rect x="440" y="320" width="160" height="35" rx="5" fill="#2196F3" opacity="0.8"/>
+    <text x="520" y="341" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+      📝 Contract Farming
+    </text>
+    
+    <rect x="620" y="320" width="160" height="35" rx="5" fill="#2196F3" opacity="0.8"/>
+    <text x="700" y="341" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+      💬 Group Chat
+    </text>
+    
+    <rect x="800" y="320" width="160" height="35" rx="5" fill="#2196F3" opacity="0.8"/>
+    <text x="880" y="341" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+      🏛️ Govt Schemes
+    </text>
+    
+    <rect x="980" y="320" width="160" height="35" rx="5" fill="#2196F3" opacity="0.8"/>
+    <text x="1060" y="341" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+      📰 News Feed
+    </text>
+    
+    <!-- Deployment Info -->
+    <text x="600" y="380" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#1565c0">
+      ☁️ Deployed on Vercel | 🌐 React.js + JavaScript + CSS3
+    </text>
+  </g>
+  
+  <!-- Backend Layer -->
+  <g id="backend-layer">
+    <rect x="50" y="440" width="1100" height="160" rx="15" fill="#fff3e0" stroke="#FF9800" stroke-width="2"/>
+    <text x="600" y="470" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#e65100">
+      🔧 Backend Layer - Flask/Python APIs
+    </text>
+    
+    <!-- Backend APIs Row 1 -->
+    <rect x="80" y="490" width="140" height="30" rx="5" fill="#FF9800" opacity="0.8"/>
+    <text x="150" y="508" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="white">
+      🤖 AI Expert API
+    </text>
+    
+    <rect x="240" y="490" width="140" height="30" rx="5" fill="#FF9800" opacity="0.8"/>
+    <text x="310" y="508" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="white">
+      🔍 Crop Analysis API
+    </text>
+    
+    <rect x="400" y="490" width="140" height="30" rx="5" fill="#FF9800" opacity="0.8"/>
+    <text x="470" y="508" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="white">
+      🌤️ Weather Service
+    </text>
+    
+    <rect x="560" y="490" width="140" height="30" rx="5" fill="#FF9800" opacity="0.8"/>
+    <text x="630" y="508" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="white">
+      🌱 Soil Analysis API
+    </text>
+    
+    <rect x="720" y="490" width="140" height="30" rx="5" fill="#FF9800" opacity="0.8"/>
+    <text x="790" y="508" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="white">
+      💰 Market Price API
+    </text>
+    
+    <rect x="880" y="490" width="140" height="30" rx="5" fill="#FF9800" opacity="0.8"/>
+    <text x="950" y="508" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="white">
+      📰 News Service
+    </text>
+    
+    <!-- Backend APIs Row 2 -->
+    <rect x="160" y="535" width="140" height="30" rx="5" fill="#FF9800" opacity="0.8"/>
+    <text x="230" y="553" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="white">
+      🔐 Authentication API
+    </text>
+    
+    <rect x="320" y="535" width="140" height="30" rx="5" fill="#FF9800" opacity="0.8"/>
+    <text x="390" y="553" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="white">
+      📱 WhatsApp Integration
+    </text>
+    
+    <rect x="480" y="535" width="140" height="30" rx="5" fill="#FF9800" opacity="0.8"/>
+    <text x="550" y="553" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="white">
+      📊 Analytics API
+    </text>
+    
+    <rect x="640" y="535" width="140" height="30" rx="5" fill="#FF9800" opacity="0.8"/>
+    <text x="710" y="553" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="white">
+      🔄 Data Processing
+    </text>
+    
+    <rect x="800" y="535" width="140" height="30" rx="5" fill="#FF9800" opacity="0.8"/>
+    <text x="870" y="553" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="white">
+      🏛️ Schemes API
+    </text>
+    
+    <!-- Backend Info -->
+    <text x="600" y="585" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#e65100">
+      ☁️ Google Cloud Platform | 🐍 Python + Flask + CORS
+    </text>
+  </g>
+  
+  <!-- AI & ML Layer -->
+  <g id="ai-ml-layer">
+    <rect x="50" y="640" width="1100" height="120" rx="15" fill="#f3e5f5" stroke="#9C27B0" stroke-width="2"/>
+    <text x="600" y="670" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#6a1b9a">
+      🧠 AI and Machine Learning Layer
+    </text>
+    
+    <!-- AI/ML Components -->
+    <rect x="100" y="690" width="180" height="35" rx="5" fill="#9C27B0" opacity="0.8"/>
+    <text x="190" y="711" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+      🚀 Groq AI Engine
+    </text>
+    
+    <rect x="300" y="690" width="180" height="35" rx="5" fill="#9C27B0" opacity="0.8"/>
+    <text x="390" y="711" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+      👁️ Computer Vision
+    </text>
+    
+    <rect x="500" y="690" width="180" height="35" rx="5" fill="#9C27B0" opacity="0.8"/>
+    <text x="590" y="711" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+      📊 ML Models
+    </text>
+    
+    <rect x="700" y="690" width="180" height="35" rx="5" fill="#9C27B0" opacity="0.8"/>
+    <text x="790" y="711" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+      🌱 Soil Health Analysis
+    </text>
+    
+    <rect x="900" y="690" width="180" height="35" rx="5" fill="#9C27B0" opacity="0.8"/>
+    <text x="990" y="711" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+      🔮 Predictive Analytics
+    </text>
+    
+    <!-- AI Info -->
+    <text x="600" y="745" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#6a1b9a">
+      🎯 Natural Language Processing | 🖼️ Image Recognition | 📈 Data Science
+    </text>
+  </g>
+  
+  <!-- External APIs Layer -->
+  <g id="external-apis-layer">
+    <rect x="50" y="800" width="1100" height="140" rx="15" fill="#e8f5e8" stroke="#4CAF50" stroke-width="2"/>
+    <text x="600" y="830" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#2e7d32">
+      🔗 External APIs and Services
+    </text>
+    
+    <!-- External APIs Row 1 -->
+    <rect x="80" y="850" width="140" height="30" rx="5" fill="#4CAF50" opacity="0.8"/>
+    <text x="150" y="868" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="white">
+      🌤️ OpenWeatherMap
+    </text>
+    
+    <rect x="240" y="850" width="140" height="30" rx="5" fill="#4CAF50" opacity="0.8"/>
+    <text x="310" y="868" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="white">
+      💰 Agmarknet
+    </text>
+    
+    <rect x="400" y="850" width="140" height="30" rx="5" fill="#4CAF50" opacity="0.8"/>
+    <text x="470" y="868" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="white">
+      📰 News API
+    </text>
+    
+    <rect x="560" y="850" width="140" height="30" rx="5" fill="#4CAF50" opacity="0.8"/>
+    <text x="630" y="868" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="white">
+      📱 Twilio/Gupshup
+    </text>
+    
+    <rect x="720" y="850" width="140" height="30" rx="5" fill="#4CAF50" opacity="0.8"/>
+    <text x="790" y="868" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="white">
+      🌿 PlantNet
+    </text>
+    
+    <rect x="880" y="850" width="140" height="30" rx="5" fill="#4CAF50" opacity="0.8"/>
+    <text x="950" y="868" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="white">
+      🔍 Plant.id
+    </text>
+    
+    <!-- External APIs Row 2 -->
+    <rect x="240" y="895" width="140" height="30" rx="5" fill="#4CAF50" opacity="0.8"/>
+    <text x="310" y="913" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="white">
+      🌍 ISRIC SoilGrids
+    </text>
+    
+    <rect x="400" y="895" width="140" height="30" rx="5" fill="#4CAF50" opacity="0.8"/>
+    <text x="470" y="913" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="white">
+      🏛️ Government APIs
+    </text>
+    
+    <rect x="560" y="895" width="140" height="30" rx="5" fill="#4CAF50" opacity="0.8"/>
+    <text x="630" y="913" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="white">
+      📊 Market Data APIs
+    </text>
+    
+    <rect x="720" y="895" width="140" height="30" rx="5" fill="#4CAF50" opacity="0.8"/>
+    <text x="790" y="913" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="white">
+      🔒 Security Services
+    </text>
+  </g>
+  
+  <!-- Database & Storage Layer -->
+  <g id="database-layer">
+    <rect x="50" y="980" width="1100" height="120" rx="15" fill="#fff3e0" stroke="#FF5722" stroke-width="2"/>
+    <text x="600" y="1010" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#d84315">
+      💾 Database and Storage Layer
+    </text>
+    
+    <!-- Database Components -->
+    <rect x="150" y="1030" width="180" height="35" rx="5" fill="#FF5722" opacity="0.8"/>
+    <text x="240" y="1051" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+      🔥 Firebase Database
+    </text>
+    
+    <rect x="370" y="1030" width="180" height="35" rx="5" fill="#FF5722" opacity="0.8"/>
+    <text x="460" y="1051" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+      ☁️ Cloud Storage
+    </text>
+    
+    <rect x="590" y="1030" width="180" height="35" rx="5" fill="#FF5722" opacity="0.8"/>
+    <text x="680" y="1051" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+      💻 Local Storage
+    </text>
+    
+    <rect x="810" y="1030" width="180" height="35" rx="5" fill="#FF5722" opacity="0.8"/>
+    <text x="900" y="1051" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+      🔄 Session Storage
+    </text>
+    
+    <!-- Database Info -->
+    <text x="600" y="1085" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#d84315">
+      📊 Real-time Data | 🔒 Secure Authentication | 📁 File Management | 🔄 Caching
+    </text>
+  </g>
+  
+  <!-- Cloud Infrastructure Layer -->
+  <g id="cloud-layer">
+    <rect x="50" y="1140" width="1100" height="120" rx="15" fill="#e3f2fd" stroke="#03A9F4" stroke-width="2"/>
+    <text x="600" y="1170" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#0277bd">
+      ☁️ Cloud Infrastructure and DevOps
+    </text>
+    
+    <!-- Cloud Components -->
+    <rect x="100" y="1190" width="160" height="35" rx="5" fill="#03A9F4" opacity="0.8"/>
+    <text x="180" y="1211" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+      ▲ Vercel (Frontend)
+    </text>
+    
+    <rect x="280" y="1190" width="160" height="35" rx="5" fill="#03A9F4" opacity="0.8"/>
+    <text x="360" y="1211" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+      🌐 Google Cloud
+    </text>
+    
+    <rect x="460" y="1190" width="160" height="35" rx="5" fill="#03A9F4" opacity="0.8"/>
+    <text x="540" y="1211" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+      📊 Analytics
+    </text>
+    
+    <rect x="640" y="1190" width="160" height="35" rx="5" fill="#03A9F4" opacity="0.8"/>
+    <text x="720" y="1211" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+      🔍 Monitoring
+    </text>
+    
+    <rect x="820" y="1190" width="160" height="35" rx="5" fill="#03A9F4" opacity="0.8"/>
+    <text x="900" y="1211" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">
+      🚀 CI/CD Pipeline
+    </text>
+    
+    <!-- Cloud Info -->
+    <text x="600" y="1245" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#0277bd">
+      🌍 Global CDN | 🔄 Auto-scaling | 🔒 SSL/TLS | 📈 Performance Monitoring
+    </text>
+  </g>
+  
+  <!-- Data Flow Arrows -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+     refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666"></polygon>
+    </marker>
+  </defs>
+  
+  <!-- User to Frontend -->
+  <line x1="600" y1="180" x2="600" y2="220" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"></line>
+  
+  <!-- Frontend to Backend -->
+  <line x1="600" y1="400" x2="600" y2="440" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"></line>
+  
+  <!-- Backend to AI/ML -->
+  <line x1="600" y1="600" x2="600" y2="640" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"></line>
+  
+  <!-- Backend to External APIs -->
+  <line x1="400" y1="600" x2="400" y2="800" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"></line>
+  <line x1="800" y1="600" x2="800" y2="800" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"></line>
+  
+  <!-- Backend to Database -->
+  <line x1="600" y1="600" x2="600" y2="980" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"></line>
+  
+  <!-- Infrastructure Support Lines -->
+  <line x1="200" y1="400" x2="200" y2="1140" stroke="#03A9F4" stroke-width="2" opacity="0.5"></line>
+  <line x1="1000" y1="400" x2="1000" y2="1140" stroke="#03A9F4" stroke-width="2" opacity="0.5"></line>
+  
+  <!-- Flow Labels -->
+  <text x="620" y="210" font-family="Arial, sans-serif" font-size="12" fill="#666">HTTP/HTTPS</text>
+  <text x="620" y="430" font-family="Arial, sans-serif" font-size="12" fill="#666">REST APIs</text>
+  <text x="620" y="630" font-family="Arial, sans-serif" font-size="12" fill="#666">AI Processing</text>
+  <text x="420" y="730" font-family="Arial, sans-serif" font-size="12" fill="#666">External Data</text>
+  <text x="620" y="890" font-family="Arial, sans-serif" font-size="12" fill="#666">Data Storage</text>
+  
+  <!-- Platform Info -->
+  <rect x="50" y="1300" width="1100" height="60" rx="10" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1"/>
+  <text x="600" y="1325" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#495057">
+    🚀 AgriGuru Platform - Empowering Indian Agriculture with AI Technology
+  </text>
+  <text x="600" y="1345" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#6c757d">
+    🌾 Real-time farming insights | 🤖 AI-powered recommendations | 🌍 Scalable cloud infrastructure
+  </text>
+  
+</svg>
