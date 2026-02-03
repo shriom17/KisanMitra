@@ -86,6 +86,62 @@ const GovtSchemes = () => {
       ],
       icon: "🏪",
       officialUrl: "https://www.enam.gov.in/"
+    },
+    {
+      id: 7,
+      title: "Kisan Credit Card (KCC)",
+      description: "Easy credit access for agricultural activities, including crop production, maintenance, and purchase of agricultural inputs",
+      eligibility: "All farmers with land ownership or tenancy rights",
+      benefits: [
+        "Easy credit access with 4% - 7% interest rate",
+        "Maximum loan amount up to ₹3 lakh",
+        "Flexible repayment based on crop cycle",
+        "Available at all major banks"
+      ],
+      icon: "💳",
+      officialUrl: "https://www.pmkisan.gov.in/"
+    },
+    {
+      id: 8,
+      title: "NABARD Agriculture Loan",
+      description: "Financial support for small and marginal farmers for farm equipment, irrigation, and crop production",
+      eligibility: "Small & Marginal farmers with valid land documents",
+      benefits: [
+        "Interest rates between 6% - 8%",
+        "Maximum loan amount up to ₹10 lakh",
+        "Subsidized rates for small farmers",
+        "Comprehensive agricultural financing"
+      ],
+      icon: "🏦",
+      officialUrl: "https://www.nabard.org/"
+    },
+    {
+      id: 9,
+      title: "State Agriculture Loan",
+      description: "State cooperative bank loans for agricultural activities and farming equipment purchase",
+      eligibility: "State resident farmers",
+      benefits: [
+        "Interest rates between 7% - 9%",
+        "Maximum loan amount up to ₹5 lakh",
+        "Easy documentation process",
+        "Quick approval for state residents"
+      ],
+      icon: "🏛️",
+      officialUrl: "#"
+    },
+    {
+      id: 10,
+      title: "Tractor/Equipment Loan",
+      description: "Specialized loans for purchase of tractors, harvesters, and other farming equipment",
+      eligibility: "Farmers with land ownership",
+      benefits: [
+        "Interest rates between 8% - 12%",
+        "Maximum loan amount up to ₹15 lakh",
+        "Long repayment tenure",
+        "Available at commercial banks"
+      ],
+      icon: "🚜",
+      officialUrl: "#"
     }
   ];
 

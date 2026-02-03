@@ -458,88 +458,10 @@ const MarketPriceDashboard = () => {
   );
 };
 
-// LoanDashboard component (mock data)
-const LoanDashboard = () => {
-  const loanSchemes = [
-    {
-      name: 'Kisan Credit Card (KCC)',
-      bank: 'All Major Banks',
-      interest: '4% - 7%',
-      maxAmount: '₹3 lakh',
-      eligibility: 'All farmers',
-      link: 'https://www.pmkisan.gov.in/'
-    },
-    {
-      name: 'NABARD Agriculture Loan',
-      bank: 'NABARD',
-      interest: '6% - 8%',
-      maxAmount: '₹10 lakh',
-      eligibility: 'Small & Marginal farmers',
-      link: 'https://www.nabard.org/'
-    },
-    {
-      name: 'PM Fasal Bima Yojana',
-      bank: 'Govt. of India',
-      interest: 'Subsidized',
-      maxAmount: '₹2 lakh',
-      eligibility: 'All farmers',
-      link: 'https://pmfby.gov.in/'
-    },
-    {
-      name: 'State Agriculture Loan',
-      bank: 'State Co-op Banks',
-      interest: '7% - 9%',
-      maxAmount: '₹5 lakh',
-      eligibility: 'State residents',
-      link: '#'
-    },
-    {
-      name: 'Tractor/Equipment Loan',
-      bank: 'Commercial Banks',
-      interest: '8% - 12%',
-      maxAmount: '₹15 lakh',
-      eligibility: 'Farmers with land',
-      link: '#'
-    }
-  ];
-
-  return (
-    <div className="loan-dashboard">
-      <div className="loan-header">
-        <h2>💰 Farmer Loan Schemes</h2>
-        <p>Explore government and bank loans available for farmers</p>
-      </div>
-      <div className="loan-list">
-        {loanSchemes.map((loan, idx) => (
-          <div key={idx} className="loan-card">
-            <div className="loan-card-header">
-              <span className="loan-icon">
-                {loan.name.includes('Credit') ? '💳' : loan.name.includes('Tractor') ? '🚜' : loan.name.includes('Bima') ? '🛡️' : loan.name.includes('NABARD') ? '🏦' : '🏛️'}
-              </span>
-              <h3>{loan.name}</h3>
-            </div>
-            <div className="loan-details">
-              <span className="loan-detail"><strong>Bank:</strong> {loan.bank}</span>
-              <span className="loan-detail"><strong>Interest:</strong> {loan.interest}</span>
-              <span className="loan-detail"><strong>Max Amount:</strong> {loan.maxAmount}</span>
-              <span className="loan-detail"><strong>Eligibility:</strong> {loan.eligibility}</span>
-            </div>
-            <a href={loan.link} target="_blank" rel="noopener noreferrer" className="loan-link">Apply</a>
-          </div>
-        ))}
-      </div>
-      <div className="loan-disclaimer" style={{marginTop: '30px', textAlign: 'center'}}>
-        <p style={{color: '#888', fontSize: '0.98rem'}}>Note: Loan details are for informational purposes. Please verify eligibility and terms with the respective bank or authority.</p>
-      </div>
-    </div>
-  );
-};
-
-// Combine both dashboards
+// Market Dashboard only (Loan schemes moved to Government Schemes page)
 const MarketAndLoanDashboard = () => (
   <div className="market-and-loan-dashboard">
     <MarketPriceDashboard />
-    <LoanDashboard />
   </div>
 );
 

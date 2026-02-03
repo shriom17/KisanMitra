@@ -1,13 +1,10 @@
-<<<<<<< HEAD
-AgriGuru/node_modules
-venv
-=======
 # Python Virtual Environments
 venv/
 ENV/
 env/
 env.bak/
 venv.bak/
+
 # Dependencies
 node_modules/
 */node_modules/
@@ -22,6 +19,7 @@ dist/
 .env.development.local
 .env.test.local
 .env.production.local
+backend/.env
 
 # Logs
 npm-debug.log*
@@ -61,14 +59,14 @@ __pycache__/
 *$py.class
 *.so
 .Python
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
+
+# Large media files
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.wmv
+*.flv
 
 # Vercel
 .vercel
-backend/.env
->>>>>>> 93a902d6102892b6762798991b2ebd7c52400ae9
-node_modules

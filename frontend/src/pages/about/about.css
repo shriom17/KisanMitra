@@ -141,6 +141,41 @@
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
+/* Video Section */
+.about-video-section {
+  margin: 60px 0;
+  padding: 40px 20px;
+  background: transparent;
+}
+
+.video-section-title {
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2d5016;
+  margin-bottom: 30px;
+  text-shadow: 0 2px 4px rgba(45, 80, 22, 0.1);
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  background: #000;
+}
+
+.about-video {
+  width: 100%;
+  height: auto;
+  display: block;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
 /* Services Section */
 .our-services {
   background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
@@ -444,18 +479,8 @@
   font-size: 1.5rem;
   color: #1a5bbf;
   margin-bottom: 1rem;
-@media (max-width: 768px) {
-  .about-feedback-section {
-    padding: 1.2rem 0.5rem;
-    width: 100%;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(42,123,228,0.04);
-  }
-  .about-feedback-section h2 {
-    font-size: 1.2rem;
-  }
 }
-}
+
 @media (max-width: 768px) {
   .about-feedback-section {
     padding: 1.2rem 0.5rem;
@@ -465,21 +490,44 @@
     box-shadow: 0 2px 8px rgba(42,123,228,0.04);
     margin: 0 0 24px 0;
   }
+  
   .about-feedback-section h2 {
     font-size: 1.2rem;
     text-align: center;
   }
+  
   .about-feedback-section form {
     width: 100%;
     font-size: 1rem;
   }
+  
   .about-feedback-section textarea {
     font-size: 1rem;
     padding: 0.5rem;
   }
+  
   .about-feedback-section button {
     font-size: 1rem;
     padding: 0.4rem 1rem;
+  }
+  
+  /* Mobile responsive for video section */
+  .about-video-section {
+    padding: 20px 15px;
+    margin: 40px 0;
+  }
+  
+  .video-section-title {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+  }
+  
+  .video-container {
+    border-radius: 10px;
+  }
+  
+  .about-video {
+    border-radius: 10px;
   }
 }
 

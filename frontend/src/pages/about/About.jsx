@@ -23,6 +23,23 @@ const About = () => {
                 <li>{t('about.features.community')}</li>
             </ul>
             </div>
+            
+            {/* Video Section */}
+            <div className='about-video-section'>
+                <h2 className='video-section-title'>Experience KisanMitra</h2>
+                <div className='video-container'>
+                    <video 
+                        className='about-video'
+                        controls
+                        playsInline
+                        preload="auto"
+                    >
+                        <source src="/videos/about-video.mp4" type="video/mp4" />
+                        <p>Your browser does not support the video tag.</p>
+                    </video>
+                </div>
+            </div>
+            
             <div className='our-services'>
                 <h2>{t('about.services_title')}</h2>
                 <ul className='services-list'>
