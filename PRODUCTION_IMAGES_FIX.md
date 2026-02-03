@@ -2,7 +2,17 @@
 
 ## Issues Fixed ✅
 
-### 1. Product Images Not Showing in Deployed Version
+### 1. Logo Not Showing in Deployed Version (CRITICAL)
+**Problem**: Logo file was 1.15MB - too large for web, causing slow/failed loads in production.
+
+**Fixed Files**:
+- [Navbar.jsx](frontend/src/components/Navbar/Navbar.jsx) - Changed from `/logo.png` (1.15MB) to `/logo192.png` (59KB)
+- [agrifarm.jsx](frontend/src/pages/agrifarm/agrifarm.jsx) - Updated contract preview logo
+- [index.html](frontend/public/index.html) - Updated social media meta tags to use `/logo512.png`
+
+**Result**: 95% smaller file size = 25x faster loading! ⚡
+
+### 2. Product Images Not Showing in Deployed Version
 **Problem**: Images were using `process.env.PUBLIC_URL` which doesn't work correctly in production builds.
 
 **Fixed Files**:
@@ -77,10 +87,14 @@ After redeploying, verify:
 
 ## Files Modified
 
-1. `frontend/src/pages/shopping/CustomerMarketplace.jsx` - Fixed image paths
-2. `frontend/src/components/FarmingExpertApp.jsx` - Fixed API URL
-3. `frontend/public/videos/` - Created directory
-4. `frontend/public/videos/README.md` - Added documentation
+1. `frontend/src/components/Navbar/Navbar.jsx` - Fixed logo path (logo.png → logo192.png)
+2. `frontend/src/pages/agrifarm/agrifarm.jsx` - Fixed contract preview logo
+3. `frontend/public/index.html` - Updated social media meta tags
+4. `frontend/src/pages/shopping/CustomerMarketplace.jsx` - Fixed image paths
+5. `frontend/src/components/FarmingExpertApp.jsx` - Fixed API URL
+6. `frontend/src/pages/about/About.jsx` - Added video error handling
+7. `frontend/public/videos/` - Created directory
+8. `frontend/public/videos/README.md` - Added documentation
 
 ## Environment Variables Required in Production
 

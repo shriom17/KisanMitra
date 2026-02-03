@@ -623,7 +623,7 @@ const AgriContractForm = () => {
           <div className="preview-header">
             <h1>🌾 KisanMitra Contract Farming Agreement Preview</h1>
             <div className="company-logo">
-              <img src="/logo.png" alt="KisanMitra" />
+              <img src="/logo192.png" alt="KisanMitra" />
             </div>
           </div>
 

@@ -43,7 +43,7 @@ const Navbar = () => {
 
         <div className="navbar-logo">
           <Link to="/" className="logo-link">
-            <img src="/logo.png" alt="AgriGuru Logo" className="logo-image" />
+            <img src="/logo192.png" alt="KisanMitra Logo" className="logo-image" />
             <h2>KisanMitra</h2>
           </Link>
         </div>
