@@ -37,7 +37,7 @@ const CustomerMarketplace = () => {
       category: 'vegetables',
       price: 40,
       originalPrice: 50,
-      image: '/images/products/tomatoes.jpeg',
+      image: `${process.env.PUBLIC_URL}/images/products/tomatoes.jpeg`,
       rating: 4.5,
       reviews: 45,
       description: 'Fresh, juicy red tomatoes directly from the farm. Perfect for salads and cooking.',
@@ -58,7 +58,7 @@ const CustomerMarketplace = () => {
       category: 'vegetables',
       price: 30,
       originalPrice: 35,
-      image: '/images/products/potatoes.jpeg',
+      image: `${process.env.PUBLIC_URL}/images/products/potatoes.jpeg`,
       rating: 4.7,
       reviews: 62,
       description: 'Premium quality organic potatoes, freshly harvested. Great for all your cooking needs.',
@@ -79,7 +79,7 @@ const CustomerMarketplace = () => {
       category: 'vegetables',
       price: 35,
       originalPrice: 40,
-      image: '/images/products/onions.jpeg',
+      image: `${process.env.PUBLIC_URL}/images/products/onions.jpeg`,
       rating: 4.3,
       reviews: 38,
       description: 'Quality red onions with rich flavor. Essential ingredient for every kitchen.',
@@ -100,7 +100,7 @@ const CustomerMarketplace = () => {
       category: 'vegetables',
       price: 25,
       originalPrice: 30,
-      image: '/images/products/spinach.jpeg',
+      image: `${process.env.PUBLIC_URL}/images/products/spinach.jpeg`,
       rating: 4.6,
       reviews: 52,
       description: 'Fresh green spinach leaves, rich in iron and nutrients. Organically grown.',
@@ -121,7 +121,7 @@ const CustomerMarketplace = () => {
       category: 'vegetables',
       price: 45,
       originalPrice: 55,
-      image: '/images/products/cauliflower.jpeg',
+      image: `${process.env.PUBLIC_URL}/images/products/cauliflower.jpeg`,
       rating: 4.4,
       reviews: 41,
       description: 'White, firm cauliflower heads. Perfect for parathas, curries, and stir-fries.',
@@ -142,7 +142,7 @@ const CustomerMarketplace = () => {
       category: 'vegetables',
       price: 60,
       originalPrice: 70,
-      image: '/images/products/greenpeas.jpeg',
+      image: `${process.env.PUBLIC_URL}/images/products/greenpeas.jpeg`,
       rating: 4.8,
       reviews: 55,
       description: 'Sweet and tender green peas. Freshly shelled and ready to cook.',
@@ -163,7 +163,7 @@ const CustomerMarketplace = () => {
       category: 'vegetables',
       price: 50,
       originalPrice: 60,
-      image: '/images/products/carrots.jpeg',
+      image: `${process.env.PUBLIC_URL}/images/products/carrots.jpeg`,
       rating: 4.5,
       reviews: 48,
       description: 'Crunchy orange carrots, rich in vitamins. Great for salads and juices.',
@@ -184,7 +184,7 @@ const CustomerMarketplace = () => {
       category: 'vegetables',
       price: 55,
       originalPrice: 65,
-      image: '/images/products/greencapsicum .jpeg',
+      image: `${process.env.PUBLIC_URL}/images/products/greencapsicum .jpeg`,
       rating: 4.2,
       reviews: 33,
       description: 'Fresh green bell peppers. Add crunch and flavor to your dishes.',
@@ -224,7 +224,7 @@ const CustomerMarketplace = () => {
           category: p.category,
           price: p.price,
           originalPrice: p.price * 1.2,
-          image: p.productImage || '/images/products/tomatoes.jpeg',
+          image: p.productImage || `${process.env.PUBLIC_URL}/images/products/tomatoes.jpeg`,
           rating: 4.5,
           reviews: p.views || 0,
           description: p.description,
@@ -409,7 +409,14 @@ const CustomerMarketplace = () => {
           filteredProducts.map(product => (
             <div key={product.id} className="product-card">
               <div className="product-image-wrapper">
-                <img src={product.image} alt={product.name} />
+                <img 
+                  src={product.image} 
+                  alt={product.name}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = `${process.env.PUBLIC_URL}/images/products/tomatoes.jpeg`;
+                  }}
+                />
                 {product.organicCertified && (
                   <span className="organic-badge">🌿 Organic</span>
                 )}
@@ -486,7 +493,14 @@ const CustomerMarketplace = () => {
             
             <div className="modal-content">
               <div className="modal-image">
-                <img src={selectedProduct.image} alt={selectedProduct.name} />
+                <img 
+                  src={selectedProduct.image} 
+                  alt={selectedProduct.name}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = `${process.env.PUBLIC_URL}/images/products/tomatoes.jpeg`;
+                  }}
+                />
               </div>
 
               <div className="modal-details">
