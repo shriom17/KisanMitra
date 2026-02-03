@@ -32,7 +32,11 @@ const About = () => {
                         className='about-video'
                         controls
                         playsInline
-                        preload="auto"
+                        preload="metadata"
+                        onError={(e) => {
+                            // Hide video if it fails to load
+                            e.target.parentElement.style.display = 'none';
+                        }}
                     >
                         <source src="/videos/about-video.mp4" type="video/mp4" />
                         <p>Your browser does not support the video tag.</p>
