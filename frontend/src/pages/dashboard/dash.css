@@ -37,10 +37,24 @@
 
 .widgets-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
   gap: 28px;
   width: 100%;
   padding: 4px;
+}
+
+@media (max-width: 1024px) {
+  .widgets-grid {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .widgets-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
 }
 
 .yield-section {
@@ -132,9 +146,9 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
   border: 1px solid #e5e7eb;
   transition: all 0.3s ease;
-  min-height: 380px;
+  min-height: 400px;
   max-height: 550px;
-  height: 480px;
+  height: auto;
   overflow-y: auto;
   width: 100%;
   box-sizing: border-box;
@@ -335,8 +349,15 @@ html {
     padding: 0;
   }
   
+  .widgets-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    grid-template-columns: 1fr;
+  }
+  
   .widget {
-    min-height: 90vh;
+    min-height: 400px;
     max-height: none;
     height: auto;
     flex: none;
@@ -392,12 +413,24 @@ html {
   }
   
   .widget {
-    min-height: 85vh;
+    min-height: 400px;
     padding: 20px 16px;
     border-radius: 16px;
     margin-bottom: 15px;
+    height: auto;
   }
   
+  .widget-yield {
+    min-height: 350px;
+  }
+  
+  .widgets-grid {
+    gap: 15px;
+  }
+  
+  .widgets {
+    gap: 15px;
+  }
   .widgets {
     gap: 16px;
   }
@@ -435,12 +468,14 @@ html {
   box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4), 
               0 10px 40px rgba(45, 80, 22, 0.2),
               inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  max-width: 95vw;
-  max-height: 92vh;
+  max-width: 90vw;
+  max-height: 90vh;
   width: 900px;
   overflow: hidden;
   animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   border: 2px solid rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
 }
 
 @keyframes slideUp {
@@ -512,10 +547,11 @@ html {
 
 .modal-body {
   padding: 30px;
-  max-height: calc(92vh - 100px);
+  max-height: calc(90vh - 100px);
   overflow-y: auto;
   overflow-x: hidden;
   background: linear-gradient(135deg, #f8fbff 0%, #ffffff 100%);
+  flex: 1;
 }
 
 .modal-body::-webkit-scrollbar {
@@ -669,19 +705,18 @@ html {
 
 /* Responsive Design */
 @media (max-width: 1200px) {
-  .widgets-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+  .main-content {
+    padding: 24px;
   }
   
-  .widgets {
-    gap: 20px;
+  .sidebar {
+    width: 220px;
+    padding: 20px;
   }
 }
 
 @media (max-width: 768px) {
   .widgets-grid {
-    grid-template-columns: 1fr;
     gap: 16px;
   }
   
@@ -691,14 +726,6 @@ html {
   
   .widget-yield {
     min-height: 350px;
-  }
-  
-  .main-content {
-    padding: 15px;
-  }
-  
-  .sidebar {
-    width: 200px;
   }
 }
 

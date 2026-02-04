@@ -79,13 +79,19 @@ const PestWidget = () => {
         <div className="widget-actions">
           <button 
             className="action-btn secondary"
-            onClick={handleQuickScan}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleQuickScan();
+            }}
             disabled={scanning}
           >
             <Camera size={14} />
             {scanning ? 'Scanning...' : 'Quick Scan'}
           </button>
-          <button className="action-btn primary">
+          <button 
+            className="action-btn primary"
+            onClick={(e) => e.stopPropagation()}
+          >
             <Upload size={14} />
             Upload Image
           </button>

@@ -86,7 +86,10 @@ const CropStatusWidget = () => {
         <h3>🌱 Crop Health Analysis</h3>
         <div className="header-actions">
           <button 
-            onClick={() => setShowHistory(!showHistory)} 
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowHistory(!showHistory);
+            }} 
             className="history-btn"
             title="View Analysis History"
           >
@@ -107,7 +110,10 @@ const CropStatusWidget = () => {
           className={`upload-area ${selectedImage ? 'has-image' : ''}`}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
-          onClick={() => fileInputRef.current?.click()}
+          onClick={(e) => {
+            e.stopPropagation();
+            fileInputRef.current?.click();
+          }}
         >
           {imagePreview ? (
             <div className="image-preview">
@@ -140,8 +146,11 @@ const CropStatusWidget = () => {
       {selectedImage && (
         <div className="action-buttons">
           <button 
-            onClick={handleAnalyze} 
-            disabled={analyzing}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleAnalyze();
+            }} 
+            disabled={!selectedImage || analyzing}
             className="analyze-btn"
           >
             {analyzing ? (
@@ -153,7 +162,13 @@ const CropStatusWidget = () => {
               '🔍 Analyze Crop'
             )}
           </button>
-          <button onClick={handleClear} className="clear-action-btn">
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              handleClear();
+            }} 
+            className="clear-action-btn"
+          >
             Clear
           </button>
         </div>

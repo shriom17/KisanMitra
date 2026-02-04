@@ -142,12 +142,18 @@ const IrrigationWidget = () => {
         <div className="widget-actions">
           <button 
             className="action-btn secondary"
-            onClick={toggleSystem}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleSystem();
+            }}
           >
             <Zap size={14} />
             Switch Mode
           </button>
-          <button className="action-btn primary">
+          <button 
+            className="action-btn primary"
+            onClick={(e) => e.stopPropagation()}
+          >
             <Droplets size={14} />
             Start Now
           </button>
