@@ -97,11 +97,19 @@ allowed_origins = [
     "http://127.0.0.1:3000", 
     "http://localhost:3001", 
     "http://127.0.0.1:3001",
+    "https://kisanmitra.vercel.app",
     "https://agri-guru-ten.vercel.app",  # Vercel production
     "https://agri-guru-7wvt9bkfg-shriom17s-projects.vercel.app",  # Vercel preview
     frontend_url,
-    frontend_url.replace('http://', 'https://') if 'http://' in frontend_url else f"https://{frontend_url}"
 ]
+
+configured_origins = os.getenv('CORS_ORIGINS', '')
+allowed_origins.extend(
+    origin.strip()
+    for origin in configured_origins.split(',')
+    if origin.strip()
+)
+allowed_origins = list(dict.fromkeys(origin for origin in allowed_origins if origin))
 
 # Add wildcard for Vercel preview deployments
 if os.getenv('NODE_ENV') == 'production':
@@ -119,8 +127,11 @@ socketio = SocketIO(
 )
 
 # Configuration
-app.config['SECRET_KEY'] = secrets.token_hex(16)
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', secrets.token_hex(16))
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['MONGO_URI'] = os.getenv('MONGO_URI', 'mongodb://localhost:27017/KisanMitradb')
 
 # Connect to MongoDB with optional connection (won't crash if MongoDB is unavailable)
@@ -648,6 +659,8 @@ def google_login():
         CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
         if not CLIENT_ID:
             return jsonify({"success": False, "message": "Google OAuth not configured"}), 500
+        if not CLIENT_SECRET:
+            return jsonify({"success": False, "message": "Google OAuth client secret not configured"}), 500
         
         # Handle authorization code flow
         if data.get('authCode'):
@@ -660,7 +673,11 @@ def google_login():
                             "client_secret": CLIENT_SECRET,
                             "auth_uri": "https://accounts.google.com/o/oauth2/auth",
                             "token_uri": "https://oauth2.googleapis.com/token",
-                            "redirect_uris": ["http://localhost:3000"]
+                                "redirect_uris": [
+                                    "http://localhost:3000",
+                                    "https://kisanmitra.vercel.app",
+                                    os.getenv('FRONTEND_URL', 'http://localhost:3000')
+                                ]
                         }
                     },
                     scopes=['openid',

@@ -35,6 +35,12 @@ class GoogleAuthService {
   // Sign in with Google using popup
   async signIn() {
     try {
+      if (!this.clientId) {
+        return {
+          success: false,
+          error: 'Google login is not configured for this deployment.'
+        };
+      }
       await this.init();
 
       return new Promise((resolve) => {
