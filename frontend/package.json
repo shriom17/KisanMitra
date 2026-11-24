@@ -15,6 +15,7 @@
     "ethers": "^6.15.0",
     "googleapis": "^160.0.0",
     "i18next": "^23.7.6",
+    "KisanMitra": "file:..",
     "lodash": "^4.17.21",
     "lucide-react": "^0.544.0",
     "postcss-preset-env": "^10.2.4",
@@ -39,7 +40,7 @@
   },
   "engines": {
     "node": "24.x",
-    "npm": "10.x"
+    "npm": "11.x"
   },
   "browserslist": {
     "production": [
