@@ -723,6 +723,12 @@ def google_login():
             }
             if not user.get('google_id'):
                 update_fields["google_id"] = google_id
+            if picture:
+                update_fields["profile_image"] = picture
+                user["profile_image"] = picture
+            if name:
+                update_fields["full_name"] = name
+                user["full_name"] = name
             
             users_collection.update_one(
                 {"_id": user["_id"]},

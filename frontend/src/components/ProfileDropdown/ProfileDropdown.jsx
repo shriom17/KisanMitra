@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -9,6 +9,11 @@ const ProfileDropdown = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const [photoError, setPhotoError] = useState(false);
+
+  useEffect(() => {
+    setPhotoError(false);
+  }, [user?.profile_image]);
 
   const handleLogout = async () => {
     if (!window.confirm('Are you sure you want to log out of KisanMitra?')) return;
@@ -46,8 +51,13 @@ const ProfileDropdown = () => {
         className="profile-button"
       >
         <div className="profile-avatar">
-          {user?.profile_image ? (
-            <img src={user.profile_image} alt="" />
+          {user?.profile_image && !photoError ? (
+            <img
+              src={user.profile_image}
+              alt=""
+              referrerPolicy="no-referrer"
+              onError={() => setPhotoError(true)}
+            />
           ) : getInitials(user?.full_name || user?.email?.split('@')[0] || 'User')}
         </div>
         <span className="profile-name">
@@ -70,8 +80,13 @@ const ProfileDropdown = () => {
           <div className="user-info">
             <div className="user-info-content">
               <div className="user-avatar-large">
-                {user?.profile_image ? (
-                  <img src={user.profile_image} alt="" />
+                {user?.profile_image && !photoError ? (
+                  <img
+                    src={user.profile_image}
+                    alt=""
+                    referrerPolicy="no-referrer"
+                    onError={() => setPhotoError(true)}
+                  />
                 ) : getInitials(user?.full_name || user?.email?.split('@')[0] || 'User')}
               </div>
               <div className="user-details">

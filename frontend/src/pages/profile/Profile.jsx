@@ -58,9 +58,11 @@ const Profile = () => {
   const [saving, setSaving] = useState(false);
   const [notice, setNotice] = useState(null);
   const [profileError, setProfileError] = useState('');
+  const [photoError, setPhotoError] = useState(false);
 
   useEffect(() => {
     if (!user) return;
+    setPhotoError(false);
     const profile = user.profile || {};
     setFormData({
       full_name: user.full_name || '',
