@@ -97,6 +97,7 @@ allowed_origins = [
     "http://127.0.0.1:3000", 
     "http://localhost:3001", 
     "http://127.0.0.1:3001",
+    "https://kisannmitra.vercel.app",
     "https://kisanmitra.vercel.app",
     "https://agri-guru-ten.vercel.app",  # Vercel production
     "https://agri-guru-7wvt9bkfg-shriom17s-projects.vercel.app",  # Vercel preview
@@ -675,11 +676,12 @@ def google_login():
                             "client_secret": CLIENT_SECRET,
                             "auth_uri": "https://accounts.google.com/o/oauth2/auth",
                             "token_uri": "https://oauth2.googleapis.com/token",
-                                "redirect_uris": [
-                                    "http://localhost:3000",
-                                    "https://kisanmitra.vercel.app",
-                                    os.getenv('FRONTEND_URL', 'http://localhost:3000')
-                                ]
+                            "redirect_uris": [
+                                "http://localhost:3000",
+                                "https://kisannmitra.vercel.app",
+                                "https://kisanmitra.vercel.app",
+                                os.getenv('FRONTEND_URL', 'http://localhost:3000')
+                            ]
                         }
                     },
                     scopes=['openid',
