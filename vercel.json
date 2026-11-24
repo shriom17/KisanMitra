@@ -1,8 +1,8 @@
 {
-  "version": 2,
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "npm --prefix frontend ci && npm --prefix frontend run build",
   "outputDirectory": "frontend/build",
-  "framework": null,
+  "framework": "create-react-app",
   "rewrites": [
     {
       "source": "/(.*)",
