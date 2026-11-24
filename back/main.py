@@ -679,7 +679,7 @@ def google_login():
                     credentials.id_token, 
                     google_requests.Request(), 
                     CLIENT_ID,
-                    clock_skew_in_seconds=10  # Allow 10 seconds clock skew
+                    clock_skew_in_seconds=300
                 )
                 
                 # Extract user information
@@ -699,7 +699,7 @@ def google_login():
                     data['idToken'], 
                     google_requests.Request(), 
                     CLIENT_ID,
-                    clock_skew_in_seconds=10  # Allow 10 seconds clock skew
+                    clock_skew_in_seconds=300
                 )
                 
                 google_id = idinfo['sub']
@@ -813,28 +813,44 @@ def update_profile():
     try:
         from bson.objectid import ObjectId
         data = request.get_json()
-        
-        # Update profile fields
-        update_data = {
-            "profile.farm_location": data.get("farm_location"),
-            "profile.farm_size": data.get("farm_size"),
-            "profile.crops": data.get("crops", []),
-            "profile.language_preference": data.get("language_preference", "en"),
-            "updated_at": datetime.utcnow()
+        if not isinstance(data, dict):
+            return jsonify({"success": False, "message": "Invalid request data"}), 400
+        nested_profile = data.get("profile") if isinstance(data.get("profile"), dict) else {}
+        update_data = {"updated_at": datetime.utcnow()}
+
+        if isinstance(data.get("full_name"), str):
+            full_name = data["full_name"].strip()
+            if not full_name:
+                return jsonify({"success": False, "message": "Full name is required"}), 400
+            update_data["full_name"] = full_name
+
+        if isinstance(data.get("phone"), str):
+            update_data["phone"] = data["phone"].strip()
+
+        profile_fields = {
+            "farm_location": nested_profile.get("farm_location", data.get("farm_location")),
+            "farm_size": nested_profile.get("farm_size", data.get("farm_size")),
+            "crops": nested_profile.get("crops", data.get("crops")),
+            "language_preference": nested_profile.get(
+                "language_preference",
+                data.get("language_preference", "en")
+            ),
+            "farm_health": nested_profile.get("farm_health", data.get("farm_health"))
         }
-        
-        # Remove None values
-        update_data = {k: v for k, v in update_data.items() if v is not None}
+
+        for field, value in profile_fields.items():
+            if value is not None:
+                update_data[f"profile.{field}"] = value
         
         result = users_collection.update_one(
             {"_id": ObjectId(session['user_id'])},
             {"$set": update_data}
         )
         
-        if result.modified_count > 0:
-            return jsonify({"success": True, "message": "Profile updated successfully"}), 200
-        else:
-            return jsonify({"success": False, "message": "No changes made"}), 400
+        if result.matched_count == 0:
+            return jsonify({"success": False, "message": "User not found"}), 404
+
+        return jsonify({"success": True, "message": "Profile updated successfully"}), 200
             
     except Exception as e:
         return jsonify({"success": False, "message": f"Profile update failed: {str(e)}"}), 500

@@ -11,6 +11,7 @@ const ProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = async () => {
+    if (!window.confirm('Are you sure you want to log out of KisanMitra?')) return;
     const result = await logout();
     if (result.success) {
       navigate('/');
@@ -45,7 +46,9 @@ const ProfileDropdown = () => {
         className="profile-button"
       >
         <div className="profile-avatar">
-          {getInitials(user?.full_name || 'User')}
+          {user?.profile_image ? (
+            <img src={user.profile_image} alt="" />
+          ) : getInitials(user?.full_name || user?.email?.split('@')[0] || 'User')}
         </div>
         <span className="profile-name">
           {user?.full_name?.split(' ')[0] || 'User'}
@@ -67,7 +70,9 @@ const ProfileDropdown = () => {
           <div className="user-info">
             <div className="user-info-content">
               <div className="user-avatar-large">
-                {getInitials(user?.full_name || 'User')}
+                {user?.profile_image ? (
+                  <img src={user.profile_image} alt="" />
+                ) : getInitials(user?.full_name || user?.email?.split('@')[0] || 'User')}
               </div>
               <div className="user-details">
                 <p className="user-name">{user?.full_name}</p>
