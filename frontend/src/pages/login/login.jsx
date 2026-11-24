@@ -30,7 +30,7 @@ const Login = () => {
         if (userType === 'farmer') {
           navigate('/dashboard'); // Farmers see dashboard with sell options
         } else {
-          navigate('/marketplace'); // Customers go to marketplace
+          navigate('/dashboard'); // Customers go to their shopping dashboard
         }
       } else {
         setError(result.message);
@@ -44,7 +44,7 @@ const Login = () => {
 
   const handleGoogleSuccess = (result) => {
     alert(`✅ Welcome via Google!`);
-    navigate(userType === 'farmer' ? '/dashboard' : '/marketplace');
+    navigate('/dashboard');
   };
 
   const handleGoogleError = (errorMessage) => {

@@ -57,7 +57,7 @@ const router = createBrowserRouter([
       },
       {
         path: "dashboard",
-        element: <RoleRoute allowedRoles={['farmer']}><Dash /></RoleRoute>
+        element: <RoleRoute allowedRoles={['farmer', 'customer']}><Dash /></RoleRoute>
       },
       {
         path: "market-prices",

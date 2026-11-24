@@ -11,10 +11,13 @@ import PestWidget from '../../components/PestWidget/PestWidget';
 import IrrigationWidget from '../../components/IrrigationWidget/IrrigationWidget';
 import FertilizerWidget from '../../components/FertilizerWidget';
 import FertilizerOptimizer from '../fertilizer/fertilizerOptimizer';
+import { useAuth } from '../../contexts/AuthContext';
+import CustomerDashboard from './CustomerDashboard';
 
 
 const Dash = () => {
   const { t } = useTranslation('common');
+  const { user } = useAuth();
   const [selectedLocation, setSelectedLocation] = useState("");
   const [weatherHighlight, setWeatherHighlight] = useState(false);
   const [soilHighlight, setSoilHighlight] = useState(false);
@@ -49,6 +52,10 @@ const Dash = () => {
       );
     }
   }, [selectedLocation]);
+
+  if (user?.userType === 'customer') {
+    return <CustomerDashboard />;
+  }
   
   return (
     <div className="dashboard">

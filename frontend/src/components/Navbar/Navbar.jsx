@@ -87,6 +87,9 @@ const Navbar = () => {
           {isCustomer && (
             <>
               <li className="navbar-item">
+                <Link to="/dashboard" className={`navbar-link ${isActive('/dashboard') ? 'active' : ''}`}>Dashboard</Link>
+              </li>
+              <li className="navbar-item">
                 <Link to="/customer-marketplace" className={`navbar-link ${isActive('/customer-marketplace') ? 'active' : ''}`}>🌾 Shop Fresh</Link>
               </li>
               <li className="navbar-item">
@@ -144,6 +147,7 @@ const Navbar = () => {
             {/* Customer-only mobile menu items */}
             {isCustomer && (
               <>
+                <li><Link to="/dashboard" className={`navbar-link ${isActive('/dashboard') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Dashboard</Link></li>
                 <li><Link to="/customer-marketplace" className={`navbar-link ${isActive('/customer-marketplace') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>🌾 Shop Fresh</Link></li>
                 <li><Link to="/my-orders" className={`navbar-link ${isActive('/my-orders') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>📦 My Orders</Link></li>
               </>
