@@ -661,6 +661,8 @@ def google_login():
             return jsonify({"success": False, "message": "Google OAuth not configured"}), 500
         if not CLIENT_SECRET:
             return jsonify({"success": False, "message": "Google OAuth client secret not configured"}), 500
+        if users_collection is None:
+            return jsonify({"success": False, "message": "Google login unavailable because the database is not connected"}), 503
         
         # Handle authorization code flow
         if data.get('authCode'):

@@ -212,7 +212,15 @@ export const AuthProvider = ({ children }) => {
           })
         });
 
-        const data = await response.json();
+        let data;
+        try {
+          data = await response.json();
+        } catch {
+          return {
+            success: false,
+            message: `Google login server returned HTTP ${response.status}.`
+          };
+        }
         console.log('📥 Google login response:', data);
 
         if (data.success && data.user) {
@@ -229,10 +237,17 @@ export const AuthProvider = ({ children }) => {
           
           return { success: true, message: 'Google login successful' };
         } else {
-          return { success: false, message: data.message || 'Google login failed' };
+          return {
+            success: false,
+            message: data.message
+              || `Google login failed on the server (HTTP ${response.status}).`
+          };
         }
       } else {
-        return { success: false, message: result.error || 'Google authentication failed' };
+        return {
+          success: false,
+          message: result.error || 'Google authentication popup failed.'
+        };
       }
     } catch (error) {
       console.error('❌ Google login error:', error);
