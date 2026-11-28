@@ -14,6 +14,7 @@ from typing import Dict, Any, Optional, List
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
+from pymongo import MongoClient
 
 # Explicitly load .env from backend directory
 env_path = os.path.join(os.path.dirname(__file__), '.env')
@@ -1679,7 +1680,19 @@ def get_contract_stats():
 
 # --- Product Management Endpoints (Marketplace) ---
 
-# In-memory storage for products (in production, use MongoDB)
+# MongoDB-backed marketplace catalog. Uses the same database as the auth backend.
+try:
+    marketplace_mongo_uri = os.getenv('MONGO_URI') or os.getenv('MONGODB_URI') or 'mongodb://localhost:27017/KisanMitradb'
+    marketplace_client = MongoClient(marketplace_mongo_uri, serverSelectionTimeoutMS=5000)
+    marketplace_client.server_info()
+    marketplace_db = marketplace_client.KisanMitradb
+    marketplace_products_collection = marketplace_db.products
+except Exception as exc:
+    logger.warning(f"⚠️ Marketplace MongoDB unavailable: {exc}")
+    marketplace_client = None
+    marketplace_db = None
+    marketplace_products_collection = None
+
 farmer_products = []
 product_counter = 1000
 
@@ -1746,8 +1759,13 @@ def create_product():
             'inquiries': 0
         }
         
-        # Store the product
-        farmer_products.append(product)
+        # Store the product in the shared MongoDB catalog
+        if marketplace_products_collection is None:
+            return jsonify({
+                'success': False,
+                'error': 'Marketplace database unavailable'
+            }), 503
+        marketplace_products_collection.insert_one(product)
         
         logger.info(f"✅ New product listed: {product_id} - {data.get('productName')} by {data.get('farmerName')}")
         
@@ -1781,23 +1799,23 @@ def get_products():
         search = request.args.get('search', '').lower()
         status = request.args.get('status', 'active')
         
-        # Filter products
-        filtered_products = farmer_products
-        
+        if marketplace_products_collection is None:
+            return jsonify({'success': False, 'error': 'Marketplace database unavailable'}), 503
+        query = {}
         if category and category != 'all':
-            filtered_products = [p for p in filtered_products if p['category'] == category]
-        
+            query['category'] = category
         if farmer_id:
-            filtered_products = [p for p in filtered_products if p['farmerId'] == farmer_id]
-        
-        if search:
-            filtered_products = [
-                p for p in filtered_products 
-                if search in p['productName'].lower() or search in p['description'].lower()
-            ]
-        
+            query['farmerId'] = farmer_id
         if status:
-            filtered_products = [p for p in filtered_products if p['status'] == status]
+            query['status'] = status
+        if search:
+            query['$or'] = [
+                {'productName': {'$regex': search, '$options': 'i'}},
+                {'description': {'$regex': search, '$options': 'i'}}
+            ]
+        filtered_products = list(marketplace_products_collection.find(query))
+        for product in filtered_products:
+            product['_id'] = str(product['_id'])
         
         return jsonify({
             'success': True,
@@ -1816,10 +1834,9 @@ def get_products():
 def get_product(product_id):
     """Get specific product by ID"""
     try:
-        product = next(
-            (p for p in farmer_products if p['id'] == product_id),
-            None
-        )
+        if marketplace_products_collection is None:
+            return jsonify({'success': False, 'error': 'Marketplace database unavailable'}), 503
+        product = marketplace_products_collection.find_one({'id': product_id})
         
         if not product:
             return jsonify({
@@ -1828,7 +1845,8 @@ def get_product(product_id):
             }), 404
         
         # Increment view count
-        product['views'] += 1
+        marketplace_products_collection.update_one({'id': product_id}, {'$inc': {'views': 1}})
+        product['_id'] = str(product['_id'])
         
         return jsonify({
             'success': True,
@@ -1848,10 +1866,9 @@ def update_product(product_id):
     try:
         data = request.get_json()
         
-        product = next(
-            (p for p in farmer_products if p['id'] == product_id),
-            None
-        )
+        if marketplace_products_collection is None:
+            return jsonify({'success': False, 'error': 'Marketplace database unavailable'}), 503
+        product = marketplace_products_collection.find_one({'id': product_id})
         
         if not product:
             return jsonify({
@@ -1864,12 +1881,10 @@ def update_product(product_id):
             'productName', 'description', 'price', 'quantity',
             'organicCertified', 'deliveryAvailable', 'status'
         ]
-        
-        for field in updateable_fields:
-            if field in data:
-                product[field] = data[field]
-        
-        product['updatedAt'] = datetime.now().isoformat()
+        update = {field: data[field] for field in updateable_fields if field in data}
+        update['updatedAt'] = datetime.now().isoformat()
+        marketplace_products_collection.update_one({'id': product_id}, {'$set': update})
+        product.update(update)
         
         logger.info(f"📝 Product updated: {product_id}")
         
@@ -1890,12 +1905,9 @@ def update_product(product_id):
 def delete_product(product_id):
     """Delete product (farmer only)"""
     try:
-        global farmer_products
-        
-        product = next(
-            (p for p in farmer_products if p['id'] == product_id),
-            None
-        )
+        if marketplace_products_collection is None:
+            return jsonify({'success': False, 'error': 'Marketplace database unavailable'}), 503
+        product = marketplace_products_collection.find_one({'id': product_id})
         
         if not product:
             return jsonify({
@@ -1903,7 +1915,7 @@ def delete_product(product_id):
                 'error': 'Product not found'
             }), 404
         
-        farmer_products = [p for p in farmer_products if p['id'] != product_id]
+        marketplace_products_collection.delete_one({'id': product_id})
         
         logger.info(f"🗑️ Product deleted: {product_id}")
         
@@ -1923,7 +1935,11 @@ def delete_product(product_id):
 def get_farmer_products(farmer_id):
     """Get all products by specific farmer"""
     try:
-        products = [p for p in farmer_products if p['farmerId'] == farmer_id]
+        if marketplace_products_collection is None:
+            return jsonify({'success': False, 'error': 'Marketplace database unavailable'}), 503
+        products = list(marketplace_products_collection.find({'farmerId': farmer_id}))
+        for product in products:
+            product['_id'] = str(product['_id'])
         
         return jsonify({
             'success': True,

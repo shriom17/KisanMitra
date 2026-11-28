@@ -11,114 +11,42 @@ const MyOrders = () => {
   const [showDetails, setShowDetails] = useState(false);
   const [filterStatus, setFilterStatus] = useState('all');
 
-  // Mock orders - In a real app, fetch from backend
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      const mockOrders = [
-        {
-          id: 'ORD001',
-          date: '2026-01-28',
-          status: 'delivered',
-          total: 1250,
-          items: [
-            {
-              id: 1,
-              name: 'Organic Tomatoes',
-              quantity: 5,
-              unit: 'kg',
-              price: 60,
-              farmerName: 'Ramesh Kumar',
+    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+    const fetchOrders = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/orders/my-orders`, {
+          credentials: 'include'
+        });
+        const data = await response.json();
+        if (response.ok && data.success) {
+          setOrders(data.orders.map(order => ({
+            id: order.orderId,
+            date: order.createdAt ? order.createdAt.slice(0, 10) : '',
+            status: order.orderStatus?.toLowerCase() || 'pending',
+            paymentStatus: order.paymentStatus,
+            total: order.totalAmount,
+            paymentMethod: order.paymentMethod || 'Razorpay',
+            paymentId: order.razorpayPaymentId,
+            items: (order.items || []).map(item => ({
+              id: item.productId,
+              name: `Product ${item.productId}`,
+              quantity: item.quantity,
+              unit: 'item',
+              price: item.price,
               image: '/images/products/tomatoes.jpeg'
-            },
-            {
-              id: 2,
-              name: 'Fresh Potatoes',
-              quantity: 10,
-              unit: 'kg',
-              price: 30,
-              farmerName: 'Sunita Devi',
-              image: '/images/products/potatoes.jpeg'
-            }
-          ],
-          deliveryAddress: '123 Main Street, Delhi, 110001',
-          paymentMethod: 'UPI',
-          trackingUpdates: [
-            { date: '2026-01-28 10:00', status: 'Order Placed', description: 'Your order has been confirmed' },
-            { date: '2026-01-28 14:30', status: 'Packed', description: 'Farmer has packed your items' },
-            { date: '2026-01-29 09:00', status: 'Shipped', description: 'Order is on the way' },
-            { date: '2026-01-29 18:00', status: 'Delivered', description: 'Order delivered successfully' }
-          ]
-        },
-        {
-          id: 'ORD002',
-          date: '2026-01-30',
-          status: 'shipped',
-          total: 890,
-          items: [
-            {
-              id: 3,
-              name: 'Fresh Spinach',
-              quantity: 2,
-              unit: 'kg',
-              price: 40,
-              farmerName: 'Amit Singh',
-              image: '/images/products/spinach.jpeg'
-            },
-            {
-              id: 4,
-              name: 'Organic Cauliflower',
-              quantity: 3,
-              unit: 'kg',
-              price: 50,
-              farmerName: 'Priya Sharma',
-              image: '/images/products/cauliflower.jpeg'
-            }
-          ],
-          deliveryAddress: '456 Garden Road, Mumbai, 400001',
-          paymentMethod: 'Card',
-          trackingUpdates: [
-            { date: '2026-01-30 11:00', status: 'Order Placed', description: 'Your order has been confirmed' },
-            { date: '2026-01-30 16:00', status: 'Packed', description: 'Farmer has packed your items' },
-            { date: '2026-01-31 08:00', status: 'Shipped', description: 'Order is on the way' }
-          ]
-        },
-        {
-          id: 'ORD003',
-          date: '2026-01-31',
-          status: 'pending',
-          total: 1560,
-          items: [
-            {
-              id: 5,
-              name: 'Basmati Rice',
-              quantity: 10,
-              unit: 'kg',
-              price: 80,
-              farmerName: 'Rajesh Patel',
-              image: '/images/products/Basmati Rice.jpg'
-            },
-            {
-              id: 6,
-              name: 'Fresh Milk',
-              quantity: 5,
-              unit: 'liters',
-              price: 60,
-              farmerName: 'Meena Devi',
-              image: '/images/products/tomatoes.jpeg'
-            }
-          ],
-          deliveryAddress: '789 Village Road, Pune, 411001',
-          paymentMethod: 'Cash on Delivery',
-          trackingUpdates: [
-            { date: '2026-01-31 10:30', status: 'Order Placed', description: 'Your order has been confirmed' }
-          ]
+            }))
+          })));
         }
-      ];
-      setOrders(mockOrders);
-      setLoading(false);
-    }, 1000);
-  }, []);
+      } catch (error) {
+        console.error('Failed to load orders:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (user) fetchOrders();
+    else setLoading(false);
+  }, [user]);
 
   const getStatusBadge = (status) => {
     const badges = {

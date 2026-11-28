@@ -1,8 +1,8 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useMarketplace } from '../../contexts/MarketplaceContext';
 import BlockchainCheckout from '../../components/BlockchainCheckout/BlockchainCheckout';
-import IndianPaymentGateway from '../../components/IndianPaymentGateway/IndianPaymentGateway';
+import RazorpayCheckout from '../../components/RazorpayCheckout/RazorpayCheckout';
 import './Checkout.css';
 
 const Checkout = () => {
@@ -20,7 +20,7 @@ const Checkout = () => {
   const [orderConfirmed, setOrderConfirmed] = useState(false);
   const [orderNumber, setOrderNumber] = useState('');
   const [showBlockchainCheckout, setShowBlockchainCheckout] = useState(false);
-  const [showIndianPaymentGateway, setShowIndianPaymentGateway] = useState(false);
+  const [showRazorpayCheckout, setShowRazorpayCheckout] = useState(false);
 
   const [formData, setFormData] = useState({
     // Contact Information
@@ -143,7 +143,7 @@ const Checkout = () => {
     
     // If Indian payment gateway is selected, show payment gateway
     if (formData.paymentMethod === 'indian_gateway') {
-      setShowIndianPaymentGateway(true);
+      setShowRazorpayCheckout(true);
       return;
     }
     
@@ -574,29 +574,33 @@ const Checkout = () => {
       </div>
       
       {/* Payment Gateway Modal */}
-      {showIndianPaymentGateway && (
-        <IndianPaymentGateway
-          onClose={() => setShowIndianPaymentGateway(false)}
-          onSuccess={() => {
-            const newOrderNumber = 'AG' + Date.now().toString().slice(-8);
-            setOrderNumber(newOrderNumber);
-            
-            // Save order to localStorage
-            const order = {
-              orderNumber: newOrderNumber,
-              date: new Date().toISOString(),
-              items: cart,
-              total: cartTotal,
-              customerInfo: formData,
-              status: 'confirmed'
-            };
-            
-            const existingOrders = JSON.parse(localStorage.getItem('KisanMitraOrders') || '[]');
-            existingOrders.unshift(order);
-            localStorage.setItem('KisanMitraOrders', JSON.stringify(existingOrders));
-            
+      {showRazorpayCheckout && (
+        <RazorpayCheckout
+          items={cart}
+          amount={finalTotal}
+          orderDetails={{
+            customerName: `${formData.firstName} ${formData.lastName}`,
+            customerEmail: formData.email,
+            customerPhone: formData.phone,
+            deliveryAddress: {
+              address: formData.address,
+              city: formData.city,
+              state: formData.state,
+              pincode: formData.pincode,
+              landmark: formData.landmark
+            }
+          }}
+          onClose={() => setShowRazorpayCheckout(false)}
+          onSuccess={(payment) => {
+            setOrderNumber(payment.orderId);
+            clearCart();
             setOrderConfirmed(true);
-            setShowIndianPaymentGateway(false);
+            setShowRazorpayCheckout(false);
+          }}
+          onFailure={(error) => {
+            setShowRazorpayCheckout(false);
+            setIsProcessing(false);
+            alert(error || 'Payment failed. Please try again.');
           }}
         />
       )}

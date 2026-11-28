@@ -1,7 +1,7 @@
 ﻿
 from flask import Flask, request, jsonify, session, send_from_directory
 from flask_cors import CORS
-from pymongo import MongoClient
+from pymongo import MongoClient, ReturnDocument
 import certifi
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
@@ -11,10 +11,19 @@ import smtplib
 import random
 import string
 import os
+import logging
+import hmac
+import hashlib
+from decimal import Decimal, ROUND_HALF_UP
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from bson.objectid import ObjectId
 from dotenv import load_dotenv
+
+try:
+    import razorpay
+except ImportError:
+    razorpay = None
 
 # Load environment variables
 load_dotenv()
@@ -153,6 +162,10 @@ try:
     chat_messages_collection = db.chat_messages
     users_collection = db.users
     otp_collection = db.otp_codes
+    products_collection = db.products
+    orders_collection = db.orders
+    payments_collection = db.payments
+    webhook_events_collection = db.payment_webhook_events
     print("âœ… MongoDB connected successfully")
 except Exception as e:
     print(f"âš ï¸ MongoDB connection failed: {e}")
@@ -161,6 +174,22 @@ except Exception as e:
     chat_messages_collection = None
     users_collection = None
     otp_collection = None
+    products_collection = None
+    orders_collection = None
+    payments_collection = None
+    webhook_events_collection = None
+
+if db is not None:
+    try:
+        users_collection.create_index('email', unique=True)
+        products_collection.create_index('id', unique=True)
+        orders_collection.create_index([('userId', 1), ('createdAt', -1)])
+        orders_collection.create_index('razorpayOrderId', unique=True, sparse=True)
+        payments_collection.create_index('razorpayPaymentId', unique=True, sparse=True)
+        payments_collection.create_index('internalOrderId')
+        webhook_events_collection.create_index('eventId', unique=True)
+    except Exception as index_error:
+        print(f"⚠️ MongoDB index setup warning: {index_error}")
 
 # Email configuration for OTP
 EMAIL_CONFIG = {
@@ -1681,6 +1710,480 @@ if __name__ == '__main__':
 
     # Use SocketIO to run the app (enables WebSocket)
     socketio.run(app, debug=True, host='0.0.0.0', port=port)
+
+def require_payment_database():
+    if db is None or not all([products_collection is not None, orders_collection is not None,
+                              payments_collection is not None, webhook_events_collection is not None]):
+        return False
+    return True
+
+
+def get_razorpay_client():
+    if razorpay is None:
+        return None
+    key_id = os.getenv('RAZORPAY_KEY_ID')
+    key_secret = os.getenv('RAZORPAY_KEY_SECRET')
+    if not key_id or not key_secret:
+        return None
+    return razorpay.Client(auth=(key_id, key_secret))
+
+
+def verify_hmac_sha256(payload, signature, secret):
+    if not payload or not signature or not secret:
+        return False
+    expected = hmac.new(secret.encode('utf-8'), payload, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(expected, signature)
+
+
+def paise(amount):
+    rupees = Decimal(str(amount)).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+    return int(rupees * 100)
+
+
+def find_product(product_id):
+    query = {'id': str(product_id), 'status': {'$ne': 'inactive'}}
+    product = products_collection.find_one(query)
+    if product is not None:
+        return product
+    if ObjectId.is_valid(str(product_id)):
+        return products_collection.find_one({'_id': ObjectId(str(product_id)), 'status': {'$ne': 'inactive'}})
+    return None
+
+
+def release_order_stock(order):
+    if order.get('stockReleased'):
+        return
+    for item in order.get('items', []):
+        try:
+            products_collection.update_one(
+                {'id': str(item['productId'])},
+                {'$inc': {'quantity': float(item['quantity'])}}
+            )
+            if ObjectId.is_valid(str(item['productId'])):
+                products_collection.update_one(
+                    {'_id': ObjectId(str(item['productId']))},
+                    {'$inc': {'quantity': float(item['quantity'])}}
+                )
+        except Exception as exc:
+            logger = logging.getLogger(__name__)
+            logger.error("Failed to release stock for order %s: %s", order['_id'], exc)
+    orders_collection.update_one({'_id': order['_id']}, {'$set': {'stockReleased': True}})
+
+
+@app.route('/api/payment/create-order', methods=['POST'])
+@require_database
+def create_payment_order():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Authentication required'}), 401
+    if not require_payment_database():
+        return jsonify({'success': False, 'error': 'Payment database unavailable'}), 503
+
+    data = request.get_json(silent=True) or {}
+    items = data.get('items')
+    if not isinstance(items, list) or not items:
+        return jsonify({'success': False, 'error': 'Cart items are required'}), 400
+    if len(items) > 100:
+        return jsonify({'success': False, 'error': 'Too many cart items'}), 400
+
+    normalized = {}
+    for item in items:
+        if not isinstance(item, dict):
+            return jsonify({'success': False, 'error': 'Invalid cart item'}), 400
+        product_id = item.get('productId')
+        quantity = item.get('quantity')
+        if product_id is None:
+            return jsonify({'success': False, 'error': 'Invalid product ID'}), 400
+        try:
+            quantity = Decimal(str(quantity))
+        except Exception:
+            return jsonify({'success': False, 'error': 'Invalid quantity'}), 400
+        if quantity <= 0 or quantity > Decimal('100000'):
+            return jsonify({'success': False, 'error': 'Invalid quantity'}), 400
+        key = str(product_id)
+        normalized[key] = normalized.get(key, Decimal('0')) + quantity
+
+    server_items = []
+    subtotal = Decimal('0')
+    reserved_items = []
+    try:
+        for product_id, quantity in normalized.items():
+            product = find_product(product_id)
+            if product is None:
+                return jsonify({'success': False, 'error': f'Invalid product ID: {product_id}'}), 400
+            stock = Decimal(str(product.get('quantity', 0)))
+            if stock < quantity:
+                return jsonify({'success': False, 'error': f'Insufficient stock for {product.get("productName", product_id)}'}), 409
+
+            price = Decimal(str(product.get('price', '0')))
+            if price <= 0:
+                return jsonify({'success': False, 'error': f'Invalid price for product {product_id}'}), 400
+
+            update_query = {'id': product_id, 'status': {'$ne': 'inactive'}, 'quantity': {'$gte': float(quantity)}}
+            updated = products_collection.find_one_and_update(
+                update_query,
+                {'$inc': {'quantity': -float(quantity)}},
+                return_document=ReturnDocument.AFTER
+            )
+            if updated is None and ObjectId.is_valid(product_id):
+                updated = products_collection.find_one_and_update(
+                    {'_id': ObjectId(product_id), 'status': {'$ne': 'inactive'}, 'quantity': {'$gte': float(quantity)}},
+                    {'$inc': {'quantity': -float(quantity)}},
+                    return_document=ReturnDocument.AFTER
+                )
+            if updated is None:
+                for reserved_id, reserved_quantity in reserved_items:
+                    products_collection.update_one({'id': reserved_id}, {'$inc': {'quantity': float(reserved_quantity)}})
+                    if ObjectId.is_valid(reserved_id):
+                        products_collection.update_one({'_id': ObjectId(reserved_id)}, {'$inc': {'quantity': float(reserved_quantity)}})
+                return jsonify({'success': False, 'error': f'Insufficient stock for {product.get("productName", product_id)}'}), 409
+
+            reserved_items.append((product_id, quantity))
+            line_total = price * quantity
+            subtotal += line_total
+            server_items.append({
+                'productId': product_id,
+                'quantity': float(quantity),
+                'price': float(price.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+            })
+    except Exception as exc:
+        for product_id, quantity in reserved_items:
+            products_collection.update_one({'id': product_id}, {'$inc': {'quantity': float(quantity)}})
+            if ObjectId.is_valid(product_id):
+                products_collection.update_one({'_id': ObjectId(product_id)}, {'$inc': {'quantity': float(quantity)}})
+        return jsonify({'success': False, 'error': 'Unable to reserve cart items'}), 500
+
+    shipping = Decimal('0') if subtotal >= Decimal('1000') else Decimal('50')
+    total = subtotal + shipping
+    if total <= 0:
+        return jsonify({'success': False, 'error': 'Invalid order amount'}), 400
+
+    now = datetime.utcnow()
+    order = {
+        'userId': ObjectId(session['user_id']) if ObjectId.is_valid(session['user_id']) else session['user_id'],
+        'items': server_items,
+        'subtotal': float(subtotal.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+        'shippingAmount': float(shipping),
+        'totalAmount': float(total.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)),
+        'currency': 'INR',
+        'orderStatus': 'PENDING',
+        'paymentStatus': 'PENDING',
+        'razorpayOrderId': None,
+        'deliveryAddress': data.get('deliveryAddress') if isinstance(data.get('deliveryAddress'), dict) else {},
+        'stockReleased': False,
+        'createdAt': now,
+        'updatedAt': now,
+    }
+    try:
+        insert_result = orders_collection.insert_one(order)
+        order['_id'] = insert_result.inserted_id
+
+        client = get_razorpay_client()
+        if client is None:
+            orders_collection.delete_one({'_id': order['_id']})
+            for product_id, quantity in reserved_items:
+                products_collection.update_one({'id': product_id}, {'$inc': {'quantity': float(quantity)}})
+            return jsonify({'success': False, 'error': 'Razorpay is not configured'}), 503
+
+        razorpay_order = client.order.create({
+            'amount': paise(total),
+            'currency': 'INR',
+            'receipt': str(order['_id']),
+            'notes': {
+                'internal_order_id': str(order['_id']),
+                'user_id': str(order['userId']),
+            }
+        })
+        razorpay_order_id = razorpay_order['id']
+        orders_collection.update_one(
+            {'_id': order['_id']},
+            {'$set': {'razorpayOrderId': razorpay_order_id, 'updatedAt': datetime.utcnow()}}
+        )
+    except Exception as exc:
+        if '_id' in order:
+            orders_collection.delete_one({'_id': order['_id']})
+        for product_id, quantity in reserved_items:
+            products_collection.update_one({'id': product_id}, {'$inc': {'quantity': float(quantity)}})
+            if ObjectId.is_valid(product_id):
+                products_collection.update_one({'_id': ObjectId(product_id)}, {'$inc': {'quantity': float(quantity)}})
+        return jsonify({'success': False, 'error': 'Could not create Razorpay order'}), 502
+
+    return jsonify({
+        'success': True,
+        'orderId': str(order['_id']),
+        'razorpayOrderId': razorpay_order_id,
+        'keyId': os.getenv('RAZORPAY_KEY_ID'),
+        'amount': paise(total),
+        'currency': 'INR',
+        'subtotal': float(subtotal),
+        'shippingAmount': float(shipping),
+        'items': server_items,
+    }), 201
+
+
+@app.route('/api/payment/verify', methods=['POST'])
+@require_database
+def verify_payment():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Authentication required'}), 401
+    if not require_payment_database():
+        return jsonify({'success': False, 'error': 'Payment database unavailable'}), 503
+
+    data = request.get_json(silent=True) or {}
+    internal_order_id = data.get('orderId') or data.get('internalOrderId')
+    razorpay_order_id = data.get('razorpayOrderId') or data.get('razorpay_order_id')
+    razorpay_payment_id = data.get('razorpayPaymentId') or data.get('razorpay_payment_id')
+    signature = data.get('razorpaySignature') or data.get('razorpay_signature')
+    if not all([internal_order_id, razorpay_order_id, razorpay_payment_id, signature]):
+        return jsonify({'success': False, 'error': 'Incomplete payment response'}), 400
+    if not ObjectId.is_valid(str(internal_order_id)):
+        return jsonify({'success': False, 'error': 'Invalid internal order'}), 400
+
+    order = orders_collection.find_one({'_id': ObjectId(str(internal_order_id))})
+    if order is None:
+        return jsonify({'success': False, 'error': 'Order not found'}), 404
+    if str(order.get('userId')) != str(session['user_id']):
+        return jsonify({'success': False, 'error': 'Unauthorized order access'}), 403
+    if order.get('razorpayOrderId') != razorpay_order_id:
+        return jsonify({'success': False, 'error': 'Payment does not belong to this order'}), 400
+
+    signature_payload = f"{razorpay_order_id}|{razorpay_payment_id}".encode('utf-8')
+    signature_valid = verify_hmac_sha256(
+        signature_payload,
+        signature,
+        os.getenv('RAZORPAY_KEY_SECRET', '')
+    )
+    if not signature_valid:
+        return jsonify({'success': False, 'error': 'Invalid payment signature'}), 400
+
+    try:
+        client = get_razorpay_client()
+        if client is not None:
+            fetched = client.payment.fetch(razorpay_payment_id)
+            if fetched.get('order_id') != razorpay_order_id:
+                return jsonify({'success': False, 'error': 'Payment association mismatch'}), 400
+            if int(fetched.get('amount', -1)) != paise(order['totalAmount']):
+                return jsonify({'success': False, 'error': 'Payment amount mismatch'}), 400
+            if fetched.get('status') not in ('captured', 'authorized'):
+                return jsonify({'success': False, 'error': 'Payment was not successful'}), 400
+            payment_method = fetched.get('method', 'unknown')
+        else:
+            payment_method = 'unknown'
+    except Exception:
+        return jsonify({'success': False, 'error': 'Could not validate payment with Razorpay'}), 502
+
+    existing = payments_collection.find_one({'razorpayPaymentId': razorpay_payment_id})
+    if existing is not None:
+        if str(existing.get('internalOrderId')) != str(order['_id']):
+            return jsonify({'success': False, 'error': 'Payment belongs to another order'}), 400
+        return jsonify({
+            'success': True,
+            'duplicate': True,
+            'orderId': str(order['_id']),
+            'paymentStatus': existing.get('paymentStatus', 'CAPTURED')
+        }), 200
+
+    now = datetime.utcnow()
+    payment = {
+        'userId': ObjectId(session['user_id']) if ObjectId.is_valid(session['user_id']) else session['user_id'],
+        'internalOrderId': order['_id'],
+        'razorpayOrderId': razorpay_order_id,
+        'razorpayPaymentId': razorpay_payment_id,
+        'amount': order['totalAmount'],
+        'currency': 'INR',
+        'paymentMethod': payment_method,
+        'paymentStatus': 'CAPTURED',
+        'signatureVerified': True,
+        'createdAt': now,
+        'updatedAt': now,
+    }
+    result = payments_collection.update_one(
+        {'razorpayPaymentId': razorpay_payment_id},
+        {'$setOnInsert': payment},
+        upsert=True
+    )
+    if result.upserted_id is None:
+        existing = payments_collection.find_one({'razorpayPaymentId': razorpay_payment_id})
+        if existing is None or str(existing.get('internalOrderId')) != str(order['_id']):
+            return jsonify({'success': False, 'error': 'Payment belongs to another order'}), 400
+
+    orders_collection.update_one(
+        {'_id': order['_id'], 'paymentStatus': {'$ne': 'CAPTURED'}},
+        {'$set': {
+            'orderStatus': 'CONFIRMED',
+            'paymentStatus': 'CAPTURED',
+            'razorpayPaymentId': razorpay_payment_id,
+            'updatedAt': datetime.utcnow()
+        }}
+    )
+    return jsonify({
+        'success': True,
+        'orderId': str(order['_id']),
+        'paymentId': razorpay_payment_id,
+        'paymentStatus': 'CAPTURED',
+        'orderStatus': 'CONFIRMED'
+    }), 200
+
+
+@app.route('/api/payment/webhook', methods=['POST'])
+def payment_webhook():
+    if not require_payment_database():
+        return jsonify({'success': False, 'error': 'Payment database unavailable'}), 503
+    raw_body = request.get_data(cache=False)
+    signature = request.headers.get('X-Razorpay-Signature', '')
+    secret = os.getenv('RAZORPAY_WEBHOOK_SECRET', '')
+    if not verify_hmac_sha256(raw_body, signature, secret):
+        return jsonify({'success': False, 'error': 'Invalid webhook signature'}), 400
+
+    payload = request.get_json(silent=True) or {}
+    event_id = payload.get('event') or 'unknown'
+    entity = payload.get('payload', {})
+    event_entity_id = None
+    for section in ('payment', 'order'):
+        if section in entity:
+            event_entity_id = entity[section].get('entity', {}).get('id')
+            if event_entity_id:
+                break
+    idempotency_id = f"{event_id}:{event_entity_id or payload.get('account_id', '')}:{payload.get('created_at', '')}"
+    if webhook_events_collection.find_one({'eventId': idempotency_id}):
+        return jsonify({'success': True, 'duplicate': True}), 200
+    webhook_events_collection.insert_one({
+        'eventId': idempotency_id,
+        'event': event_id,
+        'payload': payload,
+        'createdAt': datetime.utcnow()
+    })
+
+    event = payload.get('event')
+    payment_entity = entity.get('payment', {}).get('entity', {})
+    order_entity = entity.get('order', {}).get('entity', {})
+    razorpay_order_id = payment_entity.get('order_id') or order_entity.get('id')
+    razorpay_payment_id = payment_entity.get('id')
+
+    order = orders_collection.find_one({'razorpayOrderId': razorpay_order_id}) if razorpay_order_id else None
+    if order is None:
+        return jsonify({'success': True, 'ignored': True}), 200
+
+    now = datetime.utcnow()
+    if event in ('payment.captured', 'order.paid'):
+        payments_collection.update_one(
+            {'razorpayPaymentId': razorpay_payment_id or f"webhook-{razorpay_order_id}"},
+            {'$set': {
+                'userId': order.get('userId'),
+                'internalOrderId': order['_id'],
+                'razorpayOrderId': razorpay_order_id,
+                'razorpayPaymentId': razorpay_payment_id,
+                'amount': order['totalAmount'],
+                'currency': 'INR',
+                'paymentMethod': payment_entity.get('method', 'unknown'),
+                'paymentStatus': 'CAPTURED',
+                'signatureVerified': False,
+                'updatedAt': now,
+            }, '$setOnInsert': {'createdAt': now}},
+            upsert=bool(razorpay_payment_id)
+        )
+        orders_collection.update_one(
+            {'_id': order['_id']},
+            {'$set': {
+                'orderStatus': 'CONFIRMED',
+                'paymentStatus': 'CAPTURED',
+                'razorpayPaymentId': razorpay_payment_id,
+                'updatedAt': now
+            }}
+        )
+    elif event in ('payment.failed', 'payment.cancelled'):
+        payments_collection.update_one(
+            {'razorpayPaymentId': razorpay_payment_id} if razorpay_payment_id else {'razorpayOrderId': razorpay_order_id},
+            {'$set': {
+                'userId': order.get('userId'),
+                'internalOrderId': order['_id'],
+                'razorpayOrderId': razorpay_order_id,
+                'razorpayPaymentId': razorpay_payment_id,
+                'amount': order['totalAmount'],
+                'currency': 'INR',
+                'paymentMethod': payment_entity.get('method', 'unknown'),
+                'paymentStatus': 'FAILED',
+                'signatureVerified': False,
+                'updatedAt': now,
+            }, '$setOnInsert': {'createdAt': now}},
+            upsert=bool(razorpay_payment_id)
+        )
+        orders_collection.update_one(
+            {'_id': order['_id']},
+            {'$set': {'orderStatus': 'FAILED', 'paymentStatus': 'FAILED', 'updatedAt': now}}
+        )
+        release_order_stock(order)
+    elif event == 'refund.processed':
+        payments_collection.update_one(
+            {'razorpayOrderId': razorpay_order_id},
+            {'$set': {'paymentStatus': 'REFUNDED', 'updatedAt': now}}
+        )
+        orders_collection.update_one(
+            {'_id': order['_id']},
+            {'$set': {'paymentStatus': 'REFUNDED', 'orderStatus': 'REFUNDED', 'updatedAt': now}}
+        )
+
+    return jsonify({'success': True}), 200
+
+
+@app.route('/api/payment/<orderId>', methods=['GET'])
+@require_database
+def get_payment_status(orderId):
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Authentication required'}), 401
+    if not require_payment_database() or not ObjectId.is_valid(orderId):
+        return jsonify({'success': False, 'error': 'Invalid order'}), 400
+    order = orders_collection.find_one({'_id': ObjectId(orderId)})
+    if order is None:
+        return jsonify({'success': False, 'error': 'Order not found'}), 404
+    if str(order.get('userId')) != str(session['user_id']):
+        return jsonify({'success': False, 'error': 'Unauthorized order access'}), 403
+    payment = payments_collection.find_one({'internalOrderId': order['_id']})
+    return jsonify({
+        'success': True,
+        'order': {
+            'orderId': str(order['_id']),
+            'orderStatus': order.get('orderStatus'),
+            'paymentStatus': order.get('paymentStatus'),
+            'totalAmount': order.get('totalAmount'),
+            'currency': order.get('currency', 'INR'),
+            'razorpayOrderId': order.get('razorpayOrderId'),
+            'items': order.get('items', []),
+            'createdAt': order.get('createdAt').isoformat() if order.get('createdAt') else None,
+        },
+        'payment': {
+            'razorpayPaymentId': payment.get('razorpayPaymentId') if payment else None,
+            'paymentMethod': payment.get('paymentMethod') if payment else None,
+            'paymentStatus': payment.get('paymentStatus') if payment else order.get('paymentStatus'),
+        } if payment else None
+    }), 200
+
+
+@app.route('/api/orders/my-orders', methods=['GET'])
+@require_database
+def get_my_orders():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Authentication required'}), 401
+    if not require_payment_database():
+        return jsonify({'success': False, 'error': 'Payment database unavailable'}), 503
+    query = {'userId': ObjectId(session['user_id'])} if ObjectId.is_valid(session['user_id']) else {'userId': session['user_id']}
+    result = []
+    for order in orders_collection.find(query).sort('createdAt', -1):
+        payment = payments_collection.find_one({'internalOrderId': order['_id']})
+        result.append({
+            'orderId': str(order['_id']),
+            'items': order.get('items', []),
+            'subtotal': order.get('subtotal'),
+            'totalAmount': order.get('totalAmount'),
+            'currency': order.get('currency', 'INR'),
+            'orderStatus': order.get('orderStatus'),
+            'paymentStatus': order.get('paymentStatus'),
+            'razorpayOrderId': order.get('razorpayOrderId'),
+            'razorpayPaymentId': order.get('razorpayPaymentId') or (payment or {}).get('razorpayPaymentId'),
+            'paymentMethod': (payment or {}).get('paymentMethod'),
+            'createdAt': order.get('createdAt').isoformat() if order.get('createdAt') else None,
+        })
+    return jsonify({'success': True, 'orders': result}), 200
+
 
 # WhatsApp Test Route
 @app.route('/api/test-whatsapp', methods=['POST'])
